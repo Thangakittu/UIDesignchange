@@ -334,8 +334,8 @@ GAAD 2026 Interactive Accessibility Workshop
 Accessibility Experience Builder
 </div>
 
-<div class="sub-text">
-Create accessible and inaccessible webpages dynamically for live demonstrations.
+<div class="sub-text" style="color:#000;">
+Instructions: Create the webpage by selecting the color/font inputs and accessibility design attributes below. Use the live preview to compare accessible and inaccessible designs.
 </div>
 
 <!-- HEADER -->
@@ -1070,15 +1070,11 @@ function validateAccessibility(){
 
 validation.innerHTML =
 
-  "<h3>❌ Accessibility Validation Failed</h3><br>"
-
-  + "<p style='margin-bottom:14px;font-weight:700;'>"
-  + "Sorry, your webpage is not accessible... please try again."
-  + "</p>"
+  "<h3>Sorry, your webpage is not accessible... please try again. <br>❌ Accessibility Validation Failed</h3><br>"
 
   + errors.map(
     e => "• " + e
-  ).join("<br>")
+  ).join("<br>");
 
   + "<br><br><h3>Passed Checks</h3><br>"
 
@@ -1092,16 +1088,15 @@ validation.innerHTML =
 
 validation.innerHTML =
 
-  "<h3>✅ Accessibility Validation Passed</h3><br>"
-
-  + "<p style='margin-bottom:14px;font-weight:700;'>"
+  "<p style='margin-bottom:14px;font-weight:700;'>"
   + "🎉 Congratulations, you have created the accessible webpage."
   + "</p>"
+
+  + "<h3>✅ Accessibility Validation Passed</h3><br>"
 
   + passed.map(
     p => "• " + p
   ).join("<br>");
-
   }
 
 }
@@ -2127,16 +2122,15 @@ validationBox.className =
 
 validationBox.innerHTML =
 
-'<h3>❌ Accessibility Validation Failed</h3><br>'
-
-+ '<p style="margin-bottom:14px;font-weight:700;">'
-+ 'Sorry, your webpage is not accessible... please try again.'
-+ '</p>'
+'<h3>'
++ '<span style="font-weight:700; font-size:22px; color:#991b1b;">Sorry, your webpage is not accessible... please try again.</span>'
++ '<br><br>'
++ '<span style="font-weight:600; font-size:16px; color:#0f172a;">❌ Accessibility Validation Failed</span>'
++ '</h3><br>'
 
 + errors.map(
 e => '• ' + e
-).join('<br>')
-
+).join('<br>');
 + '<br><br><h3 style="color:#166534;">Passed Checks</h3><br>'
 
 + passed.map(
@@ -2149,11 +2143,11 @@ validationBox.className =
 
 validationBox.innerHTML =
 
-'<h3>✅ Accessibility Validation Passed</h3><br>'
-
-+ '<p style="margin-bottom:14px;font-weight:700;">'
-+ '🎉 Congratulations, you have created the accessible webpage.'
-+ '</p>'
+'<h3>'
++ '<span style="font-weight:700; font-size:22px; color:#166534;">🎉 Congratulations, you have created the accessible webpage.</span>'
++ '<br><br>'
++ '<span style="font-weight:600; font-size:16px; color:#0f172a;">✅ Accessibility Validation Passed</span>'
++ '</h3><br>'
 
 + passed.map(
 p => '• ' + p
