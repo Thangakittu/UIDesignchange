@@ -279,46 +279,41 @@ button:hover{
 
 /* RESPONSIVE */
 
-@media(max-width:1000px){
-
-  .wrapper{
-    flex-direction:column;
-  }
-
-  .left-panel,
-  .right-panel{
-    width:100%;
-  }
-
-  .right-panel{
-    height:auto;
-    position:relative;
-  }
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-}
-
-
-/* MOBILE FORM FIX */
-.field input,
-.field select,
-.field textarea {
-  width: 100%;
-  max-width: 100%;
-}
 
 @media (max-width: 1000px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+
+.grid {
+  grid-template-columns: 1fr !important;
+}
+
+.grid .field {
+  grid-column: 1 / -1 !important;
+}
+
+form .field {
+  width: 100%;
+}
+
+form .radio-group,
+form .field > div {
+  flex-direction: column !important;
+  align-items: flex-start;
+}
 
   .field {
     width: 100%;
+    margin-bottom: 16px;
   }
+
+  .field input,
+  .field textarea,
+  .field select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
 }
+
 </style>
 
 </head>
@@ -510,6 +505,11 @@ Create accessible and inaccessible webpages dynamically for live demonstrations.
 <div class="checkbox-item">
 <input type="checkbox" id="scrollPause">
 <label>Enable Scrolling Pause Button</label>
+</div>
+
+<div class="checkbox-item">
+<input type="checkbox" id="errorMessage">
+<label>Enable Error Message</label>
 </div>
 
 </div>
@@ -791,14 +791,23 @@ let paused=false;
 
 function pauseScroll(){
 
-  paused=!paused;
+  paused = !paused;
 
-  document.getElementById("marqueeText")
-  .style.animationPlayState =
+  const marquee =
+    document.getElementById("marqueeText");
 
+  const button =
+    document.getElementById("pauseBtn");
+
+  marquee.style.animationPlayState =
     paused
     ? "paused"
     : "running";
+
+  button.textContent =
+    paused
+    ? "Play Scrolling"
+    : "Pause Scrolling";
 
 }
 
@@ -1023,11 +1032,17 @@ function validateAccessibility(){
       fail:"Improper focus order detected"
     },
 
-    {
-      id:"scrollPause",
-      pass:"Pause button available for scrolling content",
-      fail:"Pause button missing for scrolling content"
-    }
+{
+  id:"scrollPause",
+  pass:"Pause button available for scrolling content",
+  fail:"Pause button missing for scrolling content"
+},
+
+{
+  id:"errorMessage",
+  pass:"Proper inline error messages enabled",
+  fail:"Generic or missing inline form error messages detected"
+}
 
   ];
 
@@ -1053,31 +1068,39 @@ function validateAccessibility(){
 
     validation.className = "validation error";
 
-    validation.innerHTML =
+validation.innerHTML =
 
-      "<h3>Accessibility Validation Failed</h3><br>"
+  "<h3>❌ Accessibility Validation Failed</h3><br>"
 
-      + errors.map(
-        e => "• " + e
-      ).join("<br>")
+  + "<p style='margin-bottom:14px;font-weight:700;'>"
+  + "Sorry, your webpage is not accessible... please try again."
+  + "</p>"
 
-      + "<br><br><h3>Passed Checks</h3><br>"
+  + errors.map(
+    e => "• " + e
+  ).join("<br>")
 
-      + passed.map(
-        p => "• " + p
-      ).join("<br>");
+  + "<br><br><h3>Passed Checks</h3><br>"
+
+  + passed.map(
+    p => "• " + p
+  ).join("<br>");
 
   }else{
 
     validation.className = "validation success";
 
-    validation.innerHTML =
+validation.innerHTML =
 
-      "<h3>✅ Accessibility Validation Passed</h3><br>"
+  "<h3>✅ Accessibility Validation Passed</h3><br>"
 
-      + passed.map(
-        p => "• " + p
-      ).join("<br>");
+  + "<p style='margin-bottom:14px;font-weight:700;'>"
+  + "🎉 Congratulations, you have created the accessible webpage."
+  + "</p>"
+
+  + passed.map(
+    p => "• " + p
+  ).join("<br>");
 
   }
 
@@ -1144,7 +1167,10 @@ focusOrder:
 document.getElementById("focusOrder").checked,
 
 scrollPause:
-document.getElementById("scrollPause").checked
+document.getElementById("scrollPause").checked,
+
+errorMessage:
+document.getElementById("errorMessage").checked,
 
 };
 
@@ -1506,6 +1532,11 @@ Experience accessibility improvements and failures dynamically.
 
 <div class="radio-group">
 
+<div
+id="titleError"
+class="field-error"
+></div>
+
 <label>
 <input type="radio" name="title">
 Mr
@@ -1524,7 +1555,15 @@ Ms
 
 <label>First Name</label>
 
-<input type="text">
+<input
+type="text"
+id="firstName"
+>
+
+<div
+id="firstNameError"
+class="field-error"
+></div>
 
 </div>
 
@@ -1532,7 +1571,15 @@ Ms
 
 <label>Last Name</label>
 
-<input type="text">
+<input
+type="text"
+id="lastName"
+>
+
+<div
+id="lastNameError"
+class="field-error"
+></div>
 
 </div>
 
@@ -1540,13 +1587,36 @@ Ms
 
 <label>Address</label>
 
-<textarea rows="5"></textarea>
+<textarea
+rows="5"
+id="address"
+></textarea>
+
+<div
+id="addressError"
+class="field-error"
+></div>
+
+<style>
+.field-error{
+
+color:#dc2626;
+font-size:14px;
+font-weight:600;
+margin-top:6px;
+
+}
+</style>
 
 </div>
 
 </div>
 
-<button class="submit-btn">
+<button
+type="button"
+class="submit-btn"
+onclick="validateForm()"
+>
 Submit
 </button>
 
@@ -1613,14 +1683,25 @@ let paused=false;
 
 function pauseScrolling(){
 
-paused=!paused;
+paused = !paused;
 
-document.getElementById("marqueeText")
-.style.animationPlayState=
+const marquee =
+document.getElementById("marqueeText");
+
+const button =
+document.querySelector(".pause-btn");
+
+marquee.style.animationPlayState =
 
 paused
 ? "paused"
 : "running";
+
+button.textContent =
+
+paused
+? "Play Scrolling"
+: "Pause Scrolling";
 
 }
 
@@ -1753,7 +1834,108 @@ bigint&255
 
 }
 
-/* ACCESSIBILITY CHECK */
+/* FORM VALIDATION CHECK */
+
+function validateForm(){
+
+const firstName =
+document.getElementById('firstName');
+
+const lastName =
+document.getElementById('lastName');
+
+const address =
+document.getElementById('address');
+
+const titleSelected =
+document.querySelector(
+'input[name="title"]:checked'
+);
+
+document.getElementById(
+'firstNameError'
+).innerHTML='';
+
+document.getElementById(
+'lastNameError'
+).innerHTML='';
+
+document.getElementById(
+'addressError'
+).innerHTML='';
+
+document.getElementById(
+'titleError'
+).innerHTML='';
+
+const genericMessage =
+'Input is required';
+
+${
+settings.errorMessage
+
+? `
+const titleMessage =
+'Title selection is required';
+
+const firstNameMessage =
+'First Name input is required';
+
+const lastNameMessage =
+'Last Name input is required';
+
+const addressMessage =
+'Address input is required';
+`
+
+: `
+const titleMessage =
+genericMessage;
+
+const firstNameMessage =
+genericMessage;
+
+const lastNameMessage =
+genericMessage;
+
+const addressMessage =
+genericMessage;
+`
+}
+
+if(!titleSelected){
+
+document.getElementById(
+'titleError'
+).innerHTML = titleMessage;
+
+}
+
+if(firstName.value.trim()===''){
+
+document.getElementById(
+'firstNameError'
+).innerHTML = firstNameMessage;
+
+}
+
+if(lastName.value.trim()===''){
+
+document.getElementById(
+'lastNameError'
+).innerHTML = lastNameMessage;
+
+}
+
+if(address.value.trim()===''){
+
+document.getElementById(
+'addressError'
+).innerHTML = addressMessage;
+
+}
+
+}
 
 /* ACCESSIBILITY CHECK */
 
@@ -1914,6 +2096,12 @@ settings.scrollPause
 : `errors.push('Pause button missing for scrolling content');`
 }
 
+${
+settings.errorMessage
+? `passed.push('Proper inline error messages enabled');`
+: `errors.push('Generic or missing inline form error messages detected');`
+}
+
 /* =========================
    FINAL RESULT
 ========================= */
@@ -1925,7 +2113,11 @@ validationBox.className =
 
 validationBox.innerHTML =
 
-'<h3>Accessibility Validation Failed</h3><br>'
+'<h3>❌ Accessibility Validation Failed</h3><br>'
+
++ '<p style="margin-bottom:14px;font-weight:700;">'
++ 'Sorry, your webpage is not accessible... please try again.'
++ '</p>'
 
 + errors.map(
 e => '• ' + e
@@ -1936,7 +2128,6 @@ e => '• ' + e
 + passed.map(
 p => '<span style="color:#166534;">• ' + p + '</span>'
 ).join('<br>');
-
 }else{
 
 validationBox.className =
@@ -1945,6 +2136,10 @@ validationBox.className =
 validationBox.innerHTML =
 
 '<h3>✅ Accessibility Validation Passed</h3><br>'
+
++ '<p style="margin-bottom:14px;font-weight:700;">'
++ '🎉 Congratulations, you have created the accessible webpage.'
++ '</p>'
 
 + passed.map(
 p => '• ' + p
