@@ -1739,30 +1739,42 @@ e.preventDefault();
 
 /* KEYBOARD TRAP */
 
-${
-!settings.keyboardTrap
+/* KEYBOARD TRAP (fixed for radio group) */
 
-? `
-document
-.getElementById('femaleRadio')
+const radios = document.querySelectorAll('input[name="title"]');
 
-.addEventListener(
-'keydown',
+let trapActive = false;
 
-function(e){
+radios.forEach(radio => {
 
-if(e.key==='Tab'){
+  radio.addEventListener('focus', function () {
+    trapActive = true;
+  });
 
-e.preventDefault();
+  radio.addEventListener('keydown', function (e) {
 
-}
+    if (!trapActive) return;
 
-}
-);
-`
+    if (e.key === 'Tab') {
+      e.preventDefault();
 
-: ""
-}
+      const currentIndex = Array.from(radios).indexOf(document.activeElement);
+
+      let nextIndex;
+
+      if (e.shiftKey) {
+        nextIndex = currentIndex === 0 ? radios.length - 1 : currentIndex - 1;
+      } else {
+        nextIndex = currentIndex === radios.length - 1 ? 0 : currentIndex + 1;
+      }
+
+      radios[nextIndex].focus();
+    }
+
+  });
+
+});
+
 
 /* FOCUS ORDER */
 
