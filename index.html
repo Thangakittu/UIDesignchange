@@ -1599,12 +1599,26 @@ class="field-error"
 
 <style>
 .field-error{
+  color:#b91c1c;
+  font-size:14px;
+  font-weight:600;
+  margin-top:8px;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  line-height:1.4;
+}
 
-color:#dc2626;
-font-size:14px;
-font-weight:600;
-margin-top:6px;
-
+.error-icon{
+  width:22px;
+  height:22px;
+  min-width:22px;
+  border-radius:50%;
+  background:#fee2e2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:1px;
 }
 </style>
 
@@ -1876,16 +1890,16 @@ settings.errorMessage
 
 ? `
 const titleMessage =
-'Title selection is required';
+'⚠️ Title selection is required';
 
 const firstNameMessage =
-'First Name input is required';
+'⚠️ First Name input is required';
 
 const lastNameMessage =
-'Last Name input is required';
+'⚠️ Last Name input is required';
 
 const addressMessage =
-'Address input is required';
+'⚠️ Address input is required';
 `
 
 : `
